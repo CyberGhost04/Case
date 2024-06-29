@@ -28,7 +28,6 @@ export const ourFileRouter = {
       // using Prisma from this point onwards
 
       if (!configId) {
-
         const configuration = await db.configuration.create({
           data: {
             imageUrl: file.url,
@@ -37,12 +36,19 @@ export const ourFileRouter = {
           },
         })
 
-        return {configId : configuration.id}
+        return { configId: configuration.id }
+      } else {
+        const updatedConfiguration = await db.configuration.update({
+          where: {
+            id: configId,
+          },
+          data: {
+            croppedImageUrl: file.url,
+          },
+        })
 
+        return { configId: updatedConfiguration.id }
       }
-
-
-      return { configId };
     }),
 } satisfies FileRouter;
 
