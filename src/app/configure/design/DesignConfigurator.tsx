@@ -1,4 +1,5 @@
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { cn } from "@/lib/utils";
 import NextImage from "next/image";
 
 interface DesignConfiguratorProps {
@@ -19,7 +20,21 @@ const DesignConfigurator = ({
                 <AspectRatio ratio={896 / 1831} className='pointer-events-none relative z-50 aspect-[896/1831] w-full'>
                     <NextImage fill alt="phone image" src="/phone-template.png" className="pointer-events-none z-50 select-none"/>
                 </AspectRatio>
+
+                {/* for shadow we will use this div */}
+                <div className='absolute z-40 inset-1 left-[3px] top-px right-[3px] bottom-px rounded-[32px] shadow-[0_0_0_99999px_rgba(229,231,235,0.6)]' />
+                <div className={cn('absolute inset-0 left-[3px] top-px right-[3px] bottom-px rounded-[32px]', `bg-blue-950`)}/>
             </div>
+
+            <div className='relative w-full h-full'>
+            <NextImage
+              src={imageUrl}
+              fill
+              alt='your image'
+              className='pointer-events-none'
+            />
+          </div>
+
         </div>
     </div>
 
