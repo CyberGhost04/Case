@@ -46,7 +46,7 @@ export const MODELS = {
       {
         label: 'Silicone',
         value: 'silicone',
-        description: undefined,
+        description: "touch grass",
         price: PRODUCT_PRICES.material.silicone,
       },
       {
