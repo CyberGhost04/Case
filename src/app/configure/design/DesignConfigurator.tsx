@@ -8,7 +8,7 @@ import NextImage from "next/image";
 import { Rnd } from 'react-rnd'
 import { RadioGroup } from "@headlessui/react"
 import { useState } from "react";
-import { COLORS, MODELS } from "@/validators/option-validator";
+import { COLORS, FINISHES, MATERIALS, MODELS } from "@/validators/option-validator";
 import { Label } from "@/components/ui/label";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
@@ -30,9 +30,13 @@ const DesignConfigurator = ({
     const [options, setOptions] = useState<{
         color: (typeof COLORS)[number]
         model: (typeof MODELS.options)[number]
+        material: (typeof MATERIALS.options)[number]
+        finish: (typeof FINISHES.options)[number]
     }>({
         color: COLORS[0],
         model: MODELS.options[0],
+        material: MATERIALS.options[0],
+        finish: FINISHES.options[0],
     })
 
     return <div className='relative mt-20 grid grid-cols-1 lg:grid-cols-3 mb-20 pb-20'>
@@ -125,6 +129,15 @@ const DesignConfigurator = ({
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>
+
+                            {[MATERIALS, FINISHES].map(({ name, options: selectableOptions }) => (
+                                <RadioGroup key={name} value={options[name]} onChange={(val) => { setOptions((prev) => ({ ...prev, [name]: val })) }}>
+                                    <Label>
+                                        {name.slice(0, 1).toUpperCase() + name.slice(1)}
+                                    </Label>
+                                </RadioGroup>
+                            ))}
+
                         </div>
                     </div>
                 </div>
