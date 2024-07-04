@@ -12,14 +12,18 @@ import { COLORS, FINISHES, MATERIALS, MODELS } from "@/validators/option-validat
 import { Label } from "@/components/ui/label";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { ArrowRight, Check, ChevronsUpDown } from "lucide-react";
 import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
+import { BASE_PRICE } from "@/config/product";
 
 interface DesignConfiguratorProps {
     configId: string
     imageUrl: string
     imageDimensions: { width: number; height: number }
 }
+// my edits
+const Places = [{ curr: 'USD' }, { curr: 'EUR' }, { curr: 'CAD' }]
+// end here, can implement use state, pass it as a parameter in the function 
 
 const DesignConfigurator = ({
     configId,
@@ -38,6 +42,18 @@ const DesignConfigurator = ({
         material: MATERIALS.options[0],
         finish: FINISHES.options[0],
     })
+
+    const [renderedDimension, setRenderedDimension] = useState({
+        width: imageDimensions.width / 4,
+        height: imageDimensions.height / 4,  // creating a canvas 
+      })
+    
+      const [renderedPosition, setRenderedPosition] = useState({
+        x: 150,
+        y: 205,
+      })
+
+    // const totalPrice = BASE_PRICE + options.material.price + options.finish.price;
 
     return <div className='relative mt-20 grid grid-cols-1 lg:grid-cols-3 mb-20 pb-20'>
         <div className='relative h-[37.5rem] overflow-hidden col-span-2 w-full max-w-4xl flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'>
@@ -74,7 +90,7 @@ const DesignConfigurator = ({
 
         </div>
 
-        <div className="h-[37.5rem] flex flex-col bg-white">
+        <div className="h-[37.5rem] w-full col-span-full lg:col-span-1 flex flex-col bg-white">
             <ScrollArea className='relative flex-1 overflow-auto'>
                 <div className="px-8 pb-12 pt-8">
                     <h2 className="tracking-tight font-bold text-3xl">Customize your case</h2>
@@ -173,11 +189,28 @@ const DesignConfigurator = ({
                                     </div>
                                 </RadioGroup>
                             ))}
-
                         </div>
                     </div>
                 </div>
             </ScrollArea>
+
+            <div className='w-full px-8 h-16 bg-white'>
+                <div className='h-px w-full bg-zinc-200' />
+                <div className='w-full h-full flex justify-end items-center'>
+                    <div className='w-full flex gap-6 items-center'>
+                        <p className='font-medium whitespace-nowrap'>
+                            {formatPrice(
+                                (BASE_PRICE + options.finish.price + options.material.price) /
+                                100
+                            )}
+                        </p>
+                        <Button size='sm' className='w-full'>
+                            Continue
+                            <ArrowRight className='h-4 w-4 ml-1.5 inline' />
+                        </Button>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>

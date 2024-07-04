@@ -7,7 +7,7 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 const NavBar = async() => {
 
     const {getUser} = getKindeServerSession();
-
+    
     const user = await getUser();
     const isAdmin = user?.email === process.env.ADMIN_EMAIL;
 
@@ -82,6 +82,7 @@ const NavBar = async() => {
                             </Link>
                         </>
                     )}
+
                 </div>
 
             </div>
