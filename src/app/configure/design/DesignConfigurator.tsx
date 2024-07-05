@@ -7,7 +7,7 @@ import { cn, formatPrice } from "@/lib/utils";
 import NextImage from "next/image";
 import { Rnd } from 'react-rnd'
 import { RadioGroup } from "@headlessui/react"
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { COLORS, FINISHES, MATERIALS, MODELS } from "@/validators/option-validator";
 import { Label } from "@/components/ui/label";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -46,19 +46,36 @@ const DesignConfigurator = ({
     const [renderedDimension, setRenderedDimension] = useState({
         width: imageDimensions.width / 4,
         height: imageDimensions.height / 4,  // creating a canvas 
-      })
-    
-      const [renderedPosition, setRenderedPosition] = useState({
+    })
+
+    const [renderedPosition, setRenderedPosition] = useState({
         x: 150,
         y: 205,
-      })
+    })
+
+    const phoneCaseRef = useRef<HTMLDivElement>(null)
+    const containerRef = useRef<HTMLDivElement>(null)
+    async function saveConfiguration() {
+        try {
+            const {left:caseLeft, top:caseTop, width, height} = phoneCaseRef.current!.getBoundingClientRect()
+
+            const {left:containerLeft, top:containerTop} = containerRef.current!.getBoundingClientRect()
+
+            const leftOffset = caseLeft - containerLeft
+            const topOffset = caseTop - containerTop
+            
+
+        } catch (err) {
+            
+        }
+    }
 
     // const totalPrice = BASE_PRICE + options.material.price + options.finish.price;
 
     return <div className='relative mt-20 grid grid-cols-1 lg:grid-cols-3 mb-20 pb-20'>
-        <div className='relative h-[37.5rem] overflow-hidden col-span-2 w-full max-w-4xl flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'>
+        <div ref={containerRef} className='relative h-[37.5rem] overflow-hidden col-span-2 w-full max-w-4xl flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'>
             <div className='relative w-60 bg-opacity-50 pointer-events-none aspect-[896/1831]'>
-                <AspectRatio ratio={896 / 1831} className='pointer-events-none relative z-50 aspect-[896/1831] w-full'>
+                <AspectRatio ref={phoneCaseRef} ratio={896 / 1831} className='pointer-events-none relative z-50 aspect-[896/1831] w-full'>
                     <NextImage fill alt="phone image" src="/phone-template.png" className="pointer-events-none z-50 select-none" />
                 </AspectRatio>
 
@@ -72,12 +89,25 @@ const DesignConfigurator = ({
                 y: 205,
                 height: imageDimensions.height / 4,
                 width: imageDimensions.width / 4,
-            }} lockAspectRatio resizeHandleComponent={{
-                bottomRight: <HandleComponent />,
-                bottomLeft: <HandleComponent />,
-                topLeft: <HandleComponent />,
-                topRight: <HandleComponent />
-            }} className="absolute z-20 border-[3px] border-green-500" >
+            }} lockAspectRatio onResizeStop={(_, __, ref, ___, { x, y }) => {
+                setRenderedDimension({
+                    height: parseInt(ref.style.height.slice(0, -2)),
+                    width: parseInt(ref.style.width.slice(0, -2)),
+                })
+
+                setRenderedPosition({ x, y })
+            }}
+
+                onDragStop={(_, { x, y }) => {         // ai integration is soo cool 
+                    setRenderedPosition({ x, y })
+                }}
+
+                resizeHandleComponent={{
+                    bottomRight: <HandleComponent />,
+                    bottomLeft: <HandleComponent />,
+                    topLeft: <HandleComponent />,
+                    topRight: <HandleComponent />
+                }} className="absolute z-20 border-[3px] border-green-500" >
                 <div className='relative w-full h-full'>
                     <NextImage
                         src={imageUrl}
