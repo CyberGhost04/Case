@@ -15,6 +15,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Check, ChevronsUpDown } from "lucide-react";
 import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
 import { BASE_PRICE } from "@/config/product";
+import { useUploadThing } from "@/lib/uploadthing";
+import { useToast } from "@/components/ui/use-toast";
 
 interface DesignConfiguratorProps {
     configId: string
@@ -30,6 +32,8 @@ const DesignConfigurator = ({
     imageUrl,
     imageDimensions,
 }: DesignConfiguratorProps) => {
+
+    const { toast } = useToast()
 
     const [options, setOptions] = useState<{
         color: (typeof COLORS)[number]
@@ -55,19 +59,64 @@ const DesignConfigurator = ({
 
     const phoneCaseRef = useRef<HTMLDivElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
+
+    const { startUpload } = useUploadThing("imageUploader")
+
     async function saveConfiguration() {
         try {
-            const {left:caseLeft, top:caseTop, width, height} = phoneCaseRef.current!.getBoundingClientRect()
+            const { left: caseLeft, top: caseTop, width, height } = phoneCaseRef.current!.getBoundingClientRect()
 
-            const {left:containerLeft, top:containerTop} = containerRef.current!.getBoundingClientRect()
+            const { left: containerLeft, top: containerTop } = containerRef.current!.getBoundingClientRect()
 
             const leftOffset = caseLeft - containerLeft
             const topOffset = caseTop - containerTop
-            
+
+            const actualX = renderedPosition.x - leftOffset
+            const actualY = renderedPosition.y - topOffset
+
+            const canvas = document.createElement("canvas")
+
+            canvas.width = width
+            canvas.height = height
+
+            const ctx = canvas.getContext("2d")
+
+            const userImage = new Image()
+            userImage.crossOrigin = "anonymous" // prevents unnecassary permission errors
+            userImage.src = imageUrl
+
+            await new Promise((resolve) => (userImage.onload = resolve))
+
+            if (ctx) {
+                ctx.drawImage(userImage, actualX, actualY, renderedDimension.width, renderedDimension.height)
+            } // toast something in else here 
+
+            const base64 = canvas.toDataURL()
+            const base64Data = base64.split(",")[1]
+
+            const blob = base64ToBlob(base64Data, "image/png")
+            const file = new File([blob], "filename.png", { type: "image/png" })
+
+            await startUpload([file], { configId })
 
         } catch (err) {
-            
+            toast({
+                title: 'Something went wrong',
+                description:
+                    'There was a problem saving your config, please try again.',
+                variant: 'destructive',
+            })
         }
+    }
+
+    function base64ToBlob(base64: string, mimeType: string) {
+        const byteCharacters = atob(base64)
+        const byteNumbers = new Array(byteCharacters.length)
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i)
+        }
+        const byteArray = new Uint8Array(byteNumbers)
+        return new Blob([byteArray], { type: mimeType })
     }
 
     // const totalPrice = BASE_PRICE + options.material.price + options.finish.price;
@@ -234,7 +283,7 @@ const DesignConfigurator = ({
                                 100
                             )}
                         </p>
-                        <Button size='sm' className='w-full'>
+                        <Button onClick={saveConfiguration} size='sm' className='w-full'>
                             Continue
                             <ArrowRight className='h-4 w-4 ml-1.5 inline' />
                         </Button>
