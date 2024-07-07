@@ -101,12 +101,15 @@ const DesignConfigurator = ({
 
         } catch (err) {
             toast({
-                title: 'Something went wrong',
+                title: 'Something went wrong on our side, please try again.',
                 description:
                     'There was a problem saving your config, please try again.',
                 variant: 'destructive',
             })
         }
+
+
+
     }
 
     function base64ToBlob(base64: string, mimeType: string) {
@@ -119,6 +122,8 @@ const DesignConfigurator = ({
         return new Blob([byteArray], { type: mimeType })
     }
 
+    // console.log(BASE_PRICE);
+    // console.log(options.material.price);
     // const totalPrice = BASE_PRICE + options.material.price + options.finish.price;
 
     return <div className='relative mt-20 grid grid-cols-1 lg:grid-cols-3 mb-20 pb-20'>
@@ -232,7 +237,7 @@ const DesignConfigurator = ({
                                     </Label>
                                     <div className="mt-3 space-y-4">
                                         {selectableOptions.map((option) => (
-                                            <RadioGroup.Option key={option.value} value={option.value} className={({ active, checked }) => cn(
+                                            <RadioGroup.Option key={option.value} value={option} className={({ active, checked }) => cn(
                                                 'relative block cursor-pointer rounded-lg bg-white px-6 py-2 shadow-sm border-2 border-zinc-200 focus:outline-none ring-0 focus:ring-0 outline-none sm:flex sm:justify-between',
                                                 {
                                                     'border-primary': active || checked,
